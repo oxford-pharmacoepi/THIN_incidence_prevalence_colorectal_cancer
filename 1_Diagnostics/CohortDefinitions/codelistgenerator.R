@@ -47,7 +47,7 @@ db_name<-"THIN_fr"
 # Name of outcome table in the result table where the outcome cohorts will be stored
 # Note, if there is an existing table in your results schema with the same names
 # it will be overwritten
-table_stem <- "dnclgenoptima"
+table_stem <- "eocrc"
 
 # create cdm reference ----
 cdm <- CDMConnector::cdm_from_con(con = db,
@@ -71,16 +71,13 @@ getConceptClassId(cdm,
 # [1] "Clinical Finding"  "Context-dependent" "HCPCS Modifier"    "ICDO Condition"
 # [5] "Procedure"
 
-# Broad lung cancer including cancers of trachea and bronchus and lower respiratory tract
-lungcancer_codes <- getCandidateCodes(
+# Colorectal ---------------
+colorectalcancer_codes <- getCandidateCodes(
   cdm = cdm,
-  keywords = c("malignant neoplasm of lung",
-               "malignant neoplasm of trachea",
-               "Primary malignant neoplasm of bronchus",
-               "Oat cell carcinoma of lung",
-               "Oat cell carcinoma of trachea",
-               "Oat cell carcinoma of main bronchus" ,
-               "malignant neoplasm of lower respiratory tract") ,
+  keywords = c("malignant tumor of colon",
+               "malignant tumor of rectum",
+               "malignant neoplasm of colon",
+               "malignant neoplasm of rectum") ,
   exclude = c("melanoma",
               "lymphoma",
               "sarcoma",
@@ -114,25 +111,25 @@ lungcancer_codes <- getCandidateCodes(
   domains = c("Condition", "Observation")
 )
 
-write.csv(lungcancer_codes, here::here("preliminary_cohorts" ,
-                                       paste0(cdmName(cdm), "_lungCancerBroad.csv")), row.names = FALSE)
+write.csv(colorectalcancer_codes, here::here("preliminary_cohorts" , "codelists",
+                                             paste0(cdmName(cdm), "_colorectalCancerBroad.csv")), row.names = FALSE)
 
-#trying out orphan codes for lung cancer BROAD
-lungcancer_orphan_codes <- findOrphanCodes(x = list("lung_cancer" = lungcancer_codes$concept_id),
-                                cdm = cdm,
-                                domains = c("Condition", "Observation"),
-                                standardConcept = "Standard",
-                                searchInSynonyms = FALSE,
-                                searchNonStandard = FALSE,
-                                includeDescendants = TRUE,
-                                includeAncestor = TRUE)
+#trying out orphan codes for colorectal cancer
+colorectalcancer_orphan_codes <- findOrphanCodes(x = list("colorectal_cancer" = colorectalcancer_codes$concept_id),
+                                                 cdm = cdm,
+                                                 domains = c("Condition", "Observation"),
+                                                 standardConcept = "Standard",
+                                                 searchInSynonyms = FALSE,
+                                                 searchNonStandard = FALSE,
+                                                 includeDescendants = TRUE,
+                                                 includeAncestor = TRUE)
 
 
-lungcancer_orphan_codes <- lungcancer_orphan_codes %>%
+colorectalcancer_orphan_codes <- colorectalcancer_orphan_codes %>%
   separate(additional_level, into = c("Description", "Concept ID"), sep = " ; ")
 
-write.csv(lungcancer_orphan_codes, here::here("preliminary_cohorts" ,
-                                       paste0(cdmName(cdm), "_lungCancerBroad_orphan.csv")), row.names = FALSE)
+write.csv(colorectalcancer_orphan_codes, here::here("preliminary_cohorts" , "codelists" ,
+                                                    paste0(cdmName(cdm), "_colorectalCancer_orphan.csv")), row.names = FALSE)
 
 
 # get codes for staging/grade
