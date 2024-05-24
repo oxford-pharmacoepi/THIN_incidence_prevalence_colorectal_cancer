@@ -4,7 +4,6 @@ renv::restore()
 library(shiny)
 library(shinydashboard)
 library(shinythemes)
-library(dplyr)
 library(readr)
 library(here)
 library(stringr)
@@ -27,7 +26,15 @@ library(rsvg)
 library(CirceR)
 library(rclipboard)
 library(CodelistGenerator)
+library(CohortSurvival)
+library(CohortCharacteristics)
+library(rjson)
+library(omopgenerics)
+library(dplyr)
+library(readr)
 
+# install.packages("devtools")
+# devtools::install_github("darwin-eu-dev/omopgenerics", force = T)
 
 mytheme <- create_theme(
   adminlte_color(
@@ -54,7 +61,15 @@ mytheme <- create_theme(
   )
 )
 
-
+# format markdown
+formatMarkdown <- function(x) {
+  lines <- strsplit(x, "\r\n\r\n") |> unlist()
+  getFormat <- function(line) {
+    if (grepl("###", line)) {return(h3(gsub("###", "", line)))} 
+    else {h4(line)} 
+  }
+  purrr::map(lines, ~ getFormat(.))
+}
 
 # Data prep functions -----
 # printing numbers with 1 decimal place and commas 
@@ -78,15 +93,6 @@ nice.num.count<-function(x) {
   trimws(format(x,
                 big.mark=",", nsmall = 0, digits=1, scientific=FALSE))}
 
-# format markdown
-formatMarkdown <- function(x) {
-  lines <- strsplit(x, "\r\n\r\n") |> unlist()
-  getFormat <- function(line) {
-    if (grepl("###", line)) {return(h3(gsub("###", "", line)))} 
-    else {h4(line)} 
-  }
-  purrr::map(lines, ~ getFormat(.))
-}
 
 
 # Load, prepare, and merge results -----
@@ -137,8 +143,43 @@ for (n in  row_number(cohort_set) ) {
 
 
 # Get concept ids from a provided path to cohort json files
-# in list form
+# in dataframe
+# Get a list of JSON files in the directory
+json_files <- list.files(path = here("www", "Cohorts", "incidence"), pattern = "\\.json$", full.names = TRUE)
+  concept_lists_temp <- list()
+  concept_lists <- list()
+  concept_sets <- list()
+  
+if(length(json_files > 0)){
+  
+  for(i in seq_along(json_files)){
+    concept_lists_temp[[i]] <- fromJSON(file = json_files[[i]]) 
+    
+  } 
 
+  for(i in 1:length(concept_lists_temp)){
+    
+    for(k in 1:length(concept_lists_temp[[i]]$ConceptSets[[1]]$expression$items)){  
+      
+      concept_sets[[k]] <- bind_rows(concept_lists_temp[[i]]$ConceptSets[[1]]$expression$items[[k]]$concept)  
+      
+    }
+
+    concept_lists[[i]] <- bind_rows(concept_sets) %>% 
+      mutate(name = concept_lists_temp[[i]]$ConceptSets[[1]]$name)
+      
+    
+  }
+  
+  
+  concept_sets_final <- bind_rows(concept_lists)
+  
+}
+
+  concept_sets_final <- concept_sets_final %>% 
+  mutate(name = ifelse(name == "lung_cancer_broad_inc", "lung_cancer_incident_broad", name)) %>% 
+  mutate(name = ifelse(name == "lung_cancer_narrow_inc", "lung_cancer_incident_narrow", name)) 
+  
 # incidence estimates not standardized -----
 incidence_estimates_files <-results[stringr::str_detect(results, ".csv")]
 incidence_estimates_files <-results[stringr::str_detect(results, "incidence_estimates")]
@@ -264,9 +305,10 @@ if(length(prevalence_estimates_files > 0)){
   
 }
 
-# survival estimates -------
+# survival estimates1 -------
 survival_estimates_files <- results[stringr::str_detect(results, ".csv")]
-survival_estimates_files <- results[stringr::str_detect(results, "survival_estimates")]
+survival_estimates_files <- results[stringr::str_detect(results, "survival_results_analysis1")]
+
 if(length(survival_estimates_files > 0)){
 
 survival_estimates <- list()
@@ -274,18 +316,26 @@ for(i in seq_along(survival_estimates_files)){
   survival_estimates[[i]]<-readr::read_csv(survival_estimates_files[[i]],
                                            show_col_types = FALSE)
 }
-survival_estimates <- dplyr::bind_rows(survival_estimates) %>% 
-  CohortSurvival::splitNameLevel(
-    name = "additional_name",
-    level = "additional_level",
-    keep = FALSE,
-    overall = FALSE) %>% 
-  mutate(time = as.numeric(time)) %>% 
-  pivot_wider(names_from = estimate_name, values_from = estimate_value) %>% 
-  filter(estimate_type == "Survival probability") %>% 
-  filter(!(group_level %in% remove_outcomes ))  %>% 
-  mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
 
+survival_estimates <- dplyr::bind_rows(survival_estimates) %>% 
+  omopgenerics::newSummarisedResult() %>% 
+  visOmopResults::splitAll(
+    keep = TRUE,
+    fill = "overall") %>%
+  mutate(time = as.numeric(time)) %>%
+  pivot_wider(names_from = estimate_name, values_from = estimate_value) 
+
+
+# # works
+# plotSurvival(survival_estimates)
+# 
+# 
+# 
+#   #mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
+# 
+# # doesnt work
+# asd <- tableSurvival(survival_estimates, times = c(365))
+  
 }
 
 # survival attrition ------
@@ -305,59 +355,58 @@ survival_attrition <- dplyr::bind_rows(survival_attrition) %>%
 }
 
 # survival summaries ------
-survival_median_files <- results[stringr::str_detect(results, ".csv")]
-survival_median_files <- results[stringr::str_detect(results, "survival_summary")]
-
-if(length(survival_median_files > 0)){
-  
-survival_median_table <- list()
-
-for(i in seq_along(survival_median_files)){
-  survival_median_table[[i]]<-readr::read_csv(survival_median_files[[i]],
-                                              show_col_types = FALSE)  
-}
-survival_median_table <- dplyr::bind_rows(survival_median_table) %>% 
-  mutate(estimate_value = as.character(estimate_value)) %>% 
-  filter(estimate_name == "number_records" |
-           estimate_name == "events" |
-           estimate_name == "median_survival" |
-         estimate_name == "median_survival_95CI_lower" |
-         estimate_name == "median_survival_95CI_higher" )  %>% 
-  mutate(result_type = "summarised_characteristics") %>% 
-  mutate(group_name = "cohort_name") %>% 
-  mutate(strata_name = case_when(
-    strata_name == "Overall" ~ "overall",
-             TRUE ~ strata_name
-           )) %>% 
-  mutate(strata_level = case_when(
-    strata_level == "Overall" ~ "overall",
-    TRUE ~ strata_level
-  )) %>% 
-  
-  mutate(estimate_type = case_when(
-    estimate_name == "number_records" ~ "integer",
-    estimate_name == "events" ~ "integer",
-    estimate_name == "median_survival" ~ "integer",
-    estimate_name == "median_survival_95CI_lower" ~ "integer",
-    estimate_name == "median_survival_95CI_higher" ~ "integer",
-    
-    
-    TRUE ~ estimate_type
-  )) %>% 
-  pivot_wider(names_from = estimate_name, values_from = estimate_value) %>% 
-  select(c("cdm_name",
-           "group_level",
-           "strata_level",
-           "median_survival"       ,
-           "median_survival_95CI_lower" ,
-           "median_survival_95CI_higher"
-           )) %>% 
-  filter(!(group_level %in% remove_outcomes ))  %>% 
-  mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
-  
-
-}
-
+# survival_median_files <- results[stringr::str_detect(results, ".csv")]
+# survival_median_files <- results[stringr::str_detect(results, "survival_summary")]
+# 
+# if(length(survival_median_files > 0)){
+#   
+# survival_median_table <- list()
+# 
+# for(i in seq_along(survival_median_files)){
+#   survival_median_table[[i]]<-readr::read_csv(survival_median_files[[i]],
+#                                               show_col_types = FALSE)  
+# }
+# survival_median_table <- dplyr::bind_rows(survival_median_table) %>% 
+#   mutate(estimate_value = as.character(estimate_value)) %>% 
+#   filter(estimate_name == "number_records" |
+#            estimate_name == "events" |
+#            estimate_name == "median_survival" |
+#          estimate_name == "median_survival_95CI_lower" |
+#          estimate_name == "median_survival_95CI_higher" )  %>% 
+#   mutate(result_type = "summarised_characteristics") %>% 
+#   mutate(group_name = "cohort_name") %>% 
+#   mutate(strata_name = case_when(
+#     strata_name == "Overall" ~ "overall",
+#              TRUE ~ strata_name
+#            )) %>% 
+#   mutate(strata_level = case_when(
+#     strata_level == "Overall" ~ "overall",
+#     TRUE ~ strata_level
+#   )) %>% 
+#   
+#   mutate(estimate_type = case_when(
+#     estimate_name == "number_records" ~ "integer",
+#     estimate_name == "events" ~ "integer",
+#     estimate_name == "median_survival" ~ "integer",
+#     estimate_name == "median_survival_95CI_lower" ~ "integer",
+#     estimate_name == "median_survival_95CI_higher" ~ "integer",
+#     
+#     
+#     TRUE ~ estimate_type
+#   )) %>% 
+#   pivot_wider(names_from = estimate_name, values_from = estimate_value) %>% 
+#   select(c("cdm_name",
+#            "group_level",
+#            "strata_level",
+#            "median_survival"       ,
+#            "median_survival_95CI_lower" ,
+#            "median_survival_95CI_higher"
+#            )) %>% 
+#   filter(!(group_level %in% remove_outcomes ))  %>% 
+#   mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
+#   
+# 
+# }
 
 # table one demographics------
 tableone_demo_files <- results[stringr::str_detect(results, ".csv")]
@@ -366,65 +415,129 @@ tableone_demo_files <- results[stringr::str_detect(results, "demographics")]
 if(length(tableone_demo_files > 0)){
 
 tableone_demo <- list()
+settings_demo <- list()
+
 for(i in seq_along(tableone_demo_files)){
+  #read in the files
   tableone_demo[[i]] <- readr::read_csv(tableone_demo_files[[i]],
-                                                 show_col_types = FALSE)  
+                                                 show_col_types = FALSE)
+  
+  
+  settings_demo[[i]] <- tableone_demo[[i]] %>%
+    dplyr::filter(variable_name == "settings")
+  
+  # remove from the summarised results
+  tableone_demo[[i]] <- tableone_demo[[i]] %>%
+    dplyr::filter(variable_name != "settings")
+  
+  #turn back into a summarised result
+  
+  tableone_demo[[i]] <- tableone_demo[[i]] %>%
+    omopgenerics::newSummarisedResult(
+      settings = tibble(
+        result_id = 1L,
+        result_type = settings_demo[[i]]$estimate_value[3],
+        package_name = settings_demo[[i]]$estimate_value[1],
+        package_version = settings_demo[[i]]$estimate_value[2],
+        value = 5)
+    )
+
+
 }
 
-demo_characteristics <- dplyr::bind_rows(tableone_demo) %>% 
-filter(!(group_level %in% remove_outcomes ) ) %>%
-  visOmopResults::splitStrata(
-    keep = TRUE,
-    fill = "overall"
-  )   %>% 
+}
+
+demo_characteristics <- Reduce(omopgenerics::bind, tableone_demo) %>%
   mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
+
+rm(tableone_demo)
 
 # table one medications ------
 tableone_med_files <- results[stringr::str_detect(results, ".csv")]
 tableone_med_files <- results[stringr::str_detect(results, "medications")]
-tableone_med <- list()
-for(i in seq_along(tableone_med_files)){
-  tableone_med[[i]] <- readr::read_csv(tableone_med_files[[i]],
-                                        show_col_types = FALSE)  
+
+if(length(tableone_med_files > 0)){
+  
+  tableone_med <- list()
+  settings_med <- list()
+  
+  for(i in seq_along(tableone_med_files)){
+    #read in the files
+    tableone_med[[i]] <- readr::read_csv(tableone_med_files[[i]],
+                                          show_col_types = FALSE)
+    
+    
+    settings_med[[i]] <- tableone_med[[i]] %>%
+      dplyr::filter(variable_name == "settings")
+    
+    # remove from the summarised results
+    tableone_med[[i]] <- tableone_med[[i]] %>%
+      dplyr::filter(variable_name != "settings")
+    
+    #turn back into a summarised result
+    
+    tableone_med[[i]] <- tableone_med[[i]] %>%
+      omopgenerics::newSummarisedResult(
+        settings = tibble(
+          result_id = 1L,
+          result_type = settings_demo[[i]]$estimate_value[3],
+          package_name = settings_demo[[i]]$estimate_value[1],
+          package_version = settings_demo[[i]]$estimate_value[2],
+          value = 5)
+      )
+
+  }
+  
 }
 
-med_characteristics <- dplyr::bind_rows(tableone_med)  %>% 
-  filter(!(group_level %in% remove_outcomes ) ) %>%
-  visOmopResults::splitStrata(
-    keep = TRUE,
-    fill = "overall"
-  )  %>%
-  visOmopResults::splitAdditional(
-  keep = TRUE,
-  fill = "overall"
-)  %>% 
+med_characteristics <- Reduce(omopgenerics::bind, tableone_med) %>%
   mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
 
+rm(tableone_med)
 
 # table one comorbidities ------
 tableone_comorb_files <- results[stringr::str_detect(results, ".csv")]
 tableone_comorb_files <- results[stringr::str_detect(results, "comorbidity")]
-tableone_comorb <- list()
-for(i in seq_along(tableone_comorb_files)){
-  tableone_comorb[[i]] <- readr::read_csv(tableone_comorb_files[[i]],
-                                       show_col_types = FALSE)  
+
+if(length(tableone_comorb_files > 0)){
+  
+  tableone_comorb <- list()
+  settings_comorb <- list()
+  
+  for(i in seq_along(tableone_comorb_files)){
+    #read in the files
+    tableone_comorb[[i]] <- readr::read_csv(tableone_comorb_files[[i]],
+                                         show_col_types = FALSE)
+    
+    
+    settings_comorb[[i]] <- tableone_comorb[[i]] %>%
+      dplyr::filter(variable_name == "settings")
+    
+    # remove from the summarised results
+    tableone_comorb[[i]] <- tableone_comorb[[i]] %>%
+      dplyr::filter(variable_name != "settings")
+    
+    #turn back into a summarised result
+    tableone_comorb[[i]] <- tableone_comorb[[i]] %>%
+      omopgenerics::newSummarisedResult(
+        settings = tibble(
+          result_id = 1L,
+          result_type = settings_comorb[[i]]$estimate_value[3],
+          package_name = settings_comorb[[i]]$estimate_value[1],
+          package_version = settings_comorb[[i]]$estimate_value[2],
+          value = 5)
+      )
+
+    
+  }
+  
 }
 
-comorb_characteristics <- dplyr::bind_rows(tableone_comorb) %>% 
-  filter(!(group_level %in% remove_outcomes ) ) %>%
-  mutate(variable_level = if_else(variable_level == "Loss of small", "loss of smell", variable_level)) %>% 
-  mutate(variable_level = if_else(variable_level == "Cancerexcludnonmelaskincancer", "Malignant neoplasm disease", variable_level)) %>% 
-  visOmopResults::splitStrata(
-    keep = TRUE,
-    fill = "overall"
-  )  %>%
-  visOmopResults::splitAdditional(
-    keep = TRUE,
-    fill = "overall"
-  )  %>% 
+
+comorb_characteristics <- Reduce(omopgenerics::bind, tableone_comorb) %>%
   mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
 
-}
+rm(tableone_comorb)
 
 # risk tables ----------
 survival_risk_table_files<-results[stringr::str_detect(results, ".csv")]

@@ -33,11 +33,8 @@ ui <- dashboardPage(
         menuSubItem(
           text = "Cohort Concepts",
           tabName = "cohort_concepts"
-        ),
-        menuSubItem(
-          text = "Clinical Cohort Descriptions",
-          tabName = "cohort_description"
         )
+
 
       ),
      
@@ -96,6 +93,7 @@ ui <- dashboardPage(
         tabName = "prevalence",
         icon = shiny::icon("bath") ,
         menuSubItem(
+          
           text = "Plots",
           tabName = "prev_plots"
         ),
@@ -409,8 +407,15 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "demographics_cohort_selector",
             label = "Cohort Name",
-            choices = unique(demo_characteristics$group_level),
-            selected = unique(demo_characteristics$group_level)[1],
+            choices = demo_characteristics %>%
+              visOmopResults::splitAll() %>% 
+              distinct(cohort_name) %>% 
+              pull(),
+            selected = demo_characteristics %>%
+              visOmopResults::splitAll() %>% 
+              distinct(cohort_name) %>% 
+              pull()%>%
+              first(),
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
@@ -435,7 +440,10 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "demographics_sex_selector",
             label = "Sex",
-            choices = unique(demo_characteristics$sex),
+            choices = demo_characteristics %>%
+              filter(strata_name == "sex" | strata_name == "overall") %>%
+              distinct(strata_level) %>% 
+              pull(),
             selected = "overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
@@ -447,7 +455,25 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "demographics_age_selector",
             label = "Age Group",
-            choices = unique(demo_characteristics$age_group),
+            choices = demo_characteristics %>%
+              filter(strata_name == "age_group" | strata_name == "overall") %>%
+              distinct(strata_level) %>% 
+              pull(),
+            selected = "overall",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "demo_diag_yr_selector",
+            label = "Diagnosis Year Group",
+            choices = demo_characteristics %>%
+              filter(strata_name == "diag_yr_gp" | strata_name == "overall") %>%
+              distinct(strata_level) %>% 
+              pull(),
             selected = "overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
@@ -475,8 +501,15 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "comorb_cohort_selector",
             label = "Cohort Name",
-            choices = unique(comorb_characteristics$group_level),
-            selected = unique(comorb_characteristics$group_level)[2],
+            choices = comorb_characteristics %>%
+              visOmopResults::splitAll() %>% 
+              distinct(cohort_name) %>% 
+              pull(),
+            selected = comorb_characteristics %>%
+              visOmopResults::splitAll() %>% 
+              distinct(cohort_name) %>% 
+              pull() %>% 
+              first(),
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
@@ -500,7 +533,10 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "comorb_sex_selector",
             label = "Sex",
-            choices = unique(comorb_characteristics$sex),
+            choices = comorb_characteristics %>%
+              filter(strata_name == "sex" | strata_name == "overall") %>%
+              distinct(strata_level) %>% 
+              pull(),
             selected = "overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
@@ -512,7 +548,10 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "comorb_age_selector",
             label = "Age Group",
-            choices = unique(comorb_characteristics$age_group),
+            choices = comorb_characteristics %>%
+              filter(strata_name == "age_group" | strata_name == "overall") %>%
+              distinct(strata_level) %>% 
+              pull(),
             selected = "overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
@@ -526,10 +565,27 @@ ui <- dashboardPage(
             inputId = "comorb_time_selector",
             label = "Time",
             choices = comorb_characteristics %>%
+              visOmopResults::splitAdditional() %>% 
               filter(window != "overall") %>%
               pull(window) %>%
               unique(),
-            selected = "-999999 to -1",
+            selected = "-Inf to -1",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "comorb_diag_yr_selector",
+            label = "Diagnosis Year Group",
+            choices = comorb_characteristics %>%
+              filter(strata_name == "diag_yr_gp" | strata_name == "overall") %>%
+              distinct(strata_level) %>% 
+              pull(),
+            selected = "overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
@@ -556,8 +612,15 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "med_cohort_selector",
             label = "Cohort Name",
-            choices = unique(med_characteristics$group_level),
-            selected = unique(med_characteristics$group_level)[1],
+            choices = med_characteristics %>%
+              visOmopResults::splitAll() %>% 
+              distinct(cohort_name) %>% 
+              pull(),
+            selected = demo_characteristics %>%
+              visOmopResults::splitAll() %>% 
+              distinct(cohort_name) %>% 
+              pull() %>% 
+              first(),
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
@@ -580,7 +643,10 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "med_sex_selector",
             label = "Sex",
-            choices = unique(med_characteristics$sex),
+            choices = med_characteristics %>%
+              filter(strata_name == "sex" | strata_name == "overall") %>%
+              distinct(strata_level) %>% 
+              pull(),
             selected = "overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
@@ -592,7 +658,10 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "med_age_selector",
             label = "Age Group",
-            choices = unique(med_characteristics$age_group),
+            choices = comorb_characteristics %>%
+              filter(strata_name == "age_group" | strata_name == "overall") %>%
+              distinct(strata_level) %>% 
+              pull(),
             selected = "overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
@@ -605,10 +674,26 @@ ui <- dashboardPage(
             inputId = "med_time_selector",
             label = "Time Window",
             choices = med_characteristics %>%
+              visOmopResults::splitAdditional() %>% 
               filter(window != "overall") %>%
               pull(window) %>%
               unique(),
             selected = "-365 to -1",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "med_diag_yr_selector",
+            label = "Diagnosis Year Group",
+            choices = med_characteristics %>%
+              filter(strata_name == "diag_yr_gp" | strata_name == "overall") %>%
+              distinct(strata_level) %>% 
+              pull(),
+            selected = "overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
@@ -655,8 +740,21 @@ ui <- dashboardPage(
             ) ,
             tabPanel(
             "Concept sets",
+            
+            
+            htmlOutput('tbl_concept_sets'),
+            
+            div(style="display:inline-block",
+                downloadButton(
+                  outputId = "dt_concept_sets_word",
+                  label = "Download table as word"
+                ), 
+                style="display:inline-block; float:right")
+            
+            ),
+            
              )
-          )
+  #        )
         ),
       
       tabItem(
@@ -978,6 +1076,7 @@ ui <- dashboardPage(
       
       tabItem(
         tabName = "prev_plots",
+        tags$h5("Below are the prevalence results for the different databases. Yearly estimates have been calculated in three different scenarios 1) Full prevalence: Those diagnosed with lung cancer are followed to the end of their observation period and remain in the numerator, 2) Partial prevalence: where patients diagnosed with lung cancer are followed until 2 or 5 years before they are then returned to the background population (denominator). ") ,
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
@@ -1252,6 +1351,7 @@ ui <- dashboardPage(
       
       tabItem(
         tabName = "inc_plots_std",
+        tags$h5("In order to compare results across different data sources with different age population structures we have age standardized incidence rates to 1) European Standard Population 2013 and 2) World Standard Population (WHO 2000-2025).") ,
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
@@ -1497,8 +1597,8 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "survival_demo_selector",
             label = "Demographics",
-            choices = unique(demo_characteristics$group_level),
-            selected = "Overall",
+            choices = unique(incidence_estimates$strata_name),
+            selected = "overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )

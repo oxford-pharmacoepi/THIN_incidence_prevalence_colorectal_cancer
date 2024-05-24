@@ -175,6 +175,54 @@ server <-	function(input, output, session) {
   )
   
   
+  #concepts_sets ----
+  get_concepts_sets <- reactive({
+    
+    validate(
+      need(input$cohort_set_input != "", "Please select a cohort")
+    )
+    
+  concept_sets_final <- concept_sets_final %>% 
+    filter(name %in% input$cohort_set_input) 
+    
+  concept_sets_final
+  
+  })
+  
+  
+  output$tbl_concept_sets <- renderText(kable(get_concepts_sets()) %>%
+                                                  kable_styling("striped", full_width = F) )
+  
+  output$dt_concept_sets_word <- downloadHandler(
+    filename = function() {
+      "concept_sets.docx"
+    },
+    content = function(file) {
+      x <- gt(get_concepts_sets())
+      gtsave(x, file)
+    }
+  )
+  
+  
+  # output$gt_demo_characteristics  <- render_gt({
+  #   CohortCharacteristics::tableCharacteristics(get_demo_characteristics(),
+  #                                               header = c("group", "cdm_name", "strata"))
+  # })
+  # 
+  
+  # output$gt_demo_characteristics_word <- downloadHandler(
+  #   filename = function() {
+  #     "demographics_characteristics.docx"
+  #   },
+  #   content = function(file) {
+  #     gtsave(CohortCharacteristics::tableCharacteristics(get_demo_characteristics(),
+  #                                                        header = c("group", "cdm_name", "strata")), file)
+  #   }
+  # )
+  # 
+  
+  
+  
   #patient_demographics ----
   get_demo_characteristics <- reactive({
 
@@ -195,11 +243,15 @@ server <-	function(input, output, session) {
     )
 
     demo_characteristics <- demo_characteristics %>%
+      visOmopResults::splitStrata() %>% 
+      visOmopResults::splitGroup() %>% 
       filter(sex %in% input$demographics_sex_selector) %>% 
       filter(age_group %in% input$demographics_age_selector) %>% 
-      filter(group_level %in% input$demographics_cohort_selector) %>% 
+      filter(cohort_name %in% input$demographics_cohort_selector) %>% 
       filter(cdm_name %in% input$demographics_database_name_selector) %>% 
-      select(-c(sex, age_group))
+      filter(year %in% input$demo_diag_yr_selector) %>% 
+      visOmopResults::uniteGroup("cohort_name") %>% 
+      visOmopResults::uniteStrata(c("sex", "age_group", "year")) 
     
 
     demo_characteristics
@@ -209,7 +261,7 @@ server <-	function(input, output, session) {
 
 
   output$gt_demo_characteristics  <- render_gt({
-    PatientProfiles::tableCharacteristics(get_demo_characteristics(),
+    CohortCharacteristics::tableCharacteristics(get_demo_characteristics(),
                                           header = c("group", "cdm_name", "strata"))
   })
 
@@ -219,7 +271,7 @@ server <-	function(input, output, session) {
       "demographics_characteristics.docx"
     },
     content = function(file) {
-      gtsave(PatientProfiles::tableCharacteristics(get_demo_characteristics(),
+      gtsave(CohortCharacteristics::tableCharacteristics(get_demo_characteristics(),
                                                    header = c("group", "cdm_name", "strata")), file)
     }
   )
@@ -248,12 +300,16 @@ server <-	function(input, output, session) {
     )
     
     comorb_characteristics <- comorb_characteristics %>%
+      visOmopResults::splitAll() %>% 
       filter(sex %in% input$comorb_sex_selector) %>%
       filter(age_group %in% input$comorb_age_selector) %>%
-      filter(group_level %in% input$comorb_cohort_selector) %>% 
+      filter(cohort_name %in% input$comorb_cohort_selector) %>% 
       filter(window %in% input$comorb_time_selector) %>% 
       filter(cdm_name %in% input$comorb_database_name_selector) %>% 
-      select(-c(sex, age_group, table, window, value))
+      filter(year %in% input$comorb_diag_yr_selector) %>% 
+      visOmopResults::uniteAdditional(c("table", "window", "value")) %>% 
+      visOmopResults::uniteGroup("cohort_name") %>% 
+      visOmopResults::uniteStrata(c("sex", "age_group", "year")) 
 
     
     comorb_characteristics
@@ -262,14 +318,12 @@ server <-	function(input, output, session) {
   
   
   output$gt_comorb_characteristics  <- render_gt({
-    PatientProfiles::tableCharacteristics(get_comorb_characteristics(),
+    CohortCharacteristics::tableCharacteristics(get_comorb_characteristics(),
                                         
                                           header = c("group", "cdm_name", "strata", "Window"),
                                           split = c("group", "strata", "additional"),
                                           excludeColumns = c("result_id", "estimate_type",
-                                                             "result_type", "value","table",
-                                                             "package_name", "package_version",
-                                                             "variable_name")
+                                                             "value","table", "variable_name")
                                           )
   })
   
@@ -280,14 +334,12 @@ server <-	function(input, output, session) {
     },
     content = function(file) {
       
-      gtsave(PatientProfiles::tableCharacteristics(get_comorb_characteristics(),
+      gtsave(CohortCharacteristics::tableCharacteristics(get_comorb_characteristics(),
                                                        
                                                        header = c("group", "cdm_name", "strata", "Window"),
                                                        split = c("group", "strata", "additional"),
                                                        excludeColumns = c("result_id", "estimate_type",
-                                                                          "result_type", "value","table",
-                                                                          "package_name", "package_version",
-                                                                          "variable_name")
+                                                                          "value","table", "variable_name")
       ), file)
     }
   )
@@ -318,12 +370,16 @@ server <-	function(input, output, session) {
     )
     
     med_characteristics <- med_characteristics %>%
+      visOmopResults::splitAll() %>% 
       filter(sex %in% input$med_sex_selector) %>%
       filter(age_group %in% input$med_age_selector) %>%
-      filter(group_level %in% input$med_cohort_selector) %>% 
+      filter(cohort_name %in% input$med_cohort_selector) %>% 
       filter(window %in% input$med_time_selector) %>% 
       filter(cdm_name %in% input$med_database_name_selector) %>% 
-      select(-c(sex, age_group, table, window, value))
+      filter(year %in% input$med_diag_yr_selector) %>% 
+      visOmopResults::uniteAdditional(c("table", "window", "value")) %>% 
+      visOmopResults::uniteGroup("cohort_name") %>% 
+      visOmopResults::uniteStrata(c("sex", "age_group", "year")) 
     
     med_characteristics
     
@@ -331,13 +387,11 @@ server <-	function(input, output, session) {
   
   
   output$gt_med_characteristics  <- render_gt({
-    PatientProfiles::tableCharacteristics(get_med_characteristics(),
+    CohortCharacteristics::tableCharacteristics(get_med_characteristics(),
                                           header = c("group", "cdm_name", "strata", "Window"),
                                           split = c("group", "strata", "additional"),
                                           excludeColumns = c("result_id", "estimate_type",
-                                                              "result_type", "value","table",
-                                                             "package_name", "package_version",
-                                                             "variable_name")
+                                                              "value","table", "variable_name")
                                           )
   })
   
@@ -348,13 +402,11 @@ server <-	function(input, output, session) {
     },
     content = function(file) {
       
-      gtsave(    PatientProfiles::tableCharacteristics(get_med_characteristics(),
+      gtsave(CohortCharacteristics::tableCharacteristics(get_med_characteristics(),
                                                        header = c("group", "cdm_name", "strata", "Window"),
                                                        split = c("group", "strata", "additional"),
                                                        excludeColumns = c("result_id", "estimate_type",
-                                                                          "result_type", "value","table",
-                                                                          "package_name", "package_version",
-                                                                          "variable_name")
+                                                                          "value","table", "variable_name")
       ), file)
     }
   )
