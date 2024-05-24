@@ -1,9 +1,9 @@
 # Incidence, Prevalence and Characterisation of Colorectal Cancer across Europe
 <img src="https://img.shields.io/badge/Study%20Status-Started-blue.svg" alt="Study Status: Started">
 
-- **Study title**: 
-- **Study start date**: 
-- **Study leads**: 
+- **Study title**: Incidence, Prevalence and Characterisation of Colorectal Cancer across Europe
+- **Study start date**: 24/05/24
+- **Study leads**: Patri Pedregal Pascual (patri.pedregalpascual@ndorms.ox.ac.uk)
 - **Study end date**:
 - **PhenotypeR ShinyApp 1**: 
 - **PhenotypeR ShinyApp 2**: 
