@@ -22,14 +22,14 @@ library(SqlRender)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
-db_name <- "..."
+db_name <- "THIN_fr"
 
 # Specify databaseConnector connection details -----
-user <- "..."
-password <- "..."
-port <- "..."
-host <- "..."
-server_dbi <- "..."
+user <- Sys.getenv("DB_USER")
+password <- Sys.getenv("DB_PASSWORD")
+port <- Sys.getenv("DB_PORT")
+host <- Sys.getenv("DB_HOST")
+server_dbi <- Sys.getenv("DB_SERVER_cdm_thin_fr_202308_dbi")
 
 
 
@@ -37,7 +37,7 @@ server_dbi <- "..."
 # In this study we also use the DBI package to connect to the database
 # set up the dbConnect details below (see https://dbi.r-dbi.org/articles/dbi for more details)
 # you may need to install another package for this (although RPostgres is included with renv in case you are using postgres)
-db <- DBI::dbConnect("...",
+db <- DBI::dbConnect(RPostgres::Postgres(),
                      dbname = server_dbi,
                      port = port,
                      host = host, 
@@ -48,17 +48,17 @@ db <- DBI::dbConnect("...",
 # Set database details -----
 # The name of the schema that contains the OMOP CDM with patient-level data
 #cdm_database_schema <- "public"
-cdm_schema <- "..."
+cdm_schema <- "public"
 
 # The name of the schema where results tables will be created 
-write_schema <- "..."
+write_schema <- "results"
 
 # where your Achilles scheme is located (you should have run achilles when mapping your database) 
-achilles_schema <- "..."
+achilles_schema <- "results"
 
 # Table prefix -----
 # any tables created in the database during the analysis will start with this prefix
-study_prefix <- "optima_diagnositics_"
+study_prefix <- "optima_crc_diagnositics_"
 
 # Run the study ------
 source(here("RunStudy.R"))
