@@ -31,7 +31,7 @@ library(CohortCharacteristics)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
-db_name<-"THIN_be"
+db_name<-"..."
 
 # Specify databaseConnector connection details -----
 # database connection details
@@ -40,7 +40,7 @@ user <- Sys.getenv("DB_USER")
 password <- Sys.getenv("DB_PASSWORD")
 port <- Sys.getenv("DB_PORT")
 host <- Sys.getenv("DB_HOST")
-server_dbi <- Sys.getenv("DB_SERVER_cdm_thin_be_202308_dbi")
+server_dbi <- Sys.getenv("...")
 
 
 # Specify cdm_reference via DBI connection details -----
