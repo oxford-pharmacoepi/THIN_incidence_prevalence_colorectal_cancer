@@ -22,14 +22,14 @@ library(SqlRender)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
-db_name <- "THIN_fr"
+db_name <- "..."
 
 # Specify databaseConnector connection details -----
 user <- Sys.getenv("DB_USER")
 password <- Sys.getenv("DB_PASSWORD")
 port <- Sys.getenv("DB_PORT")
 host <- Sys.getenv("DB_HOST")
-server_dbi <- Sys.getenv("DB_SERVER_cdm_thin_fr_202308_dbi")
+server_dbi <- Sys.getenv("...")
 
 
 
