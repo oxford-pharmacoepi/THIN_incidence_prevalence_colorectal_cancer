@@ -29,7 +29,7 @@ user <- Sys.getenv("DB_USER")
 password <- Sys.getenv("DB_PASSWORD")
 port <- Sys.getenv("DB_PORT")
 host <- Sys.getenv("DB_HOST")
-server_dbi <- Sys.getenv("...")
+server_dbi <- Sys.getenv("DB_SERVER_cdm_thin_..._202308_dbi")
 
 
 
