@@ -135,8 +135,8 @@ write.csv(colorectalcancer_orphan_codes, here::here("preliminary_cohorts" , "cod
 # Creating cohort files ------------
 
 # read in reviewed list of codelists
-reviewed_code_list_colorectal_cancer <- read.csv(here::here("preliminary_cohorts" ,"reviewed_codelists" ,
-                                                            paste0(cdmName(cdm), "_colorectalCancerBroad_reviewed.csv")))
+reviewed_code_list_colorectal_cancer <- read.csv2(here::here("preliminary_cohorts" ,"reviewed_codelists" ,
+                                                            paste0(cdmName(cdm), "_colorectalCancerBroad_reviewed_ppp.csv")))
 
 colorectal_cancer <- reviewed_code_list_colorectal_cancer %>%
   filter(include == "y" &
@@ -235,21 +235,6 @@ writeCohort(total_prev_colorectal_cancer, here::here("preliminary_cohorts", "jso
                                                      "colorectal_cancer_end.json"))
 
 
-
-#prev 2 year
-partial_prev2y_colorectal_cancer <- cohort(
-  entry = entry(
-    conditionOccurrence(getConceptSetDetails(cs(colorectal_cancer_prev, name = "colorectal_cancer_2y"), db, vocabularyDatabaseSchema = "public")),
-    observationWindow = continuousObservation(0L, 0L),
-    primaryCriteriaLimit = "First"
-  ),
-  exit = exit(fixedExit("startDate", 720L)
-  )
-)
-
-writeCohort(partial_prev2y_colorectal_cancer, here::here("preliminary_cohorts", "jsons",
-                                                         "colorectal_cancer_2y.json"))
-
 # prev 5 year
 partial_prev5y_colorectal_cancer <- cohort(
   entry = entry(
@@ -263,6 +248,20 @@ partial_prev5y_colorectal_cancer <- cohort(
 
 writeCohort(partial_prev5y_colorectal_cancer, here::here("preliminary_cohorts", "jsons",
                                                          "colorectal_cancer_5y.json"))
+
+# prev 10 year
+partial_prev10y_colorectal_cancer <- cohort(
+  entry = entry(
+    conditionOccurrence(getConceptSetDetails(cs(colorectal_cancer_prev, name = "colorectal_cancer_10y"), db, vocabularyDatabaseSchema = "public")),
+    observationWindow = continuousObservation(0L, 0L),
+    primaryCriteriaLimit = "First"
+  ),
+  exit = exit(fixedExit("startDate", 3650L)
+  )
+)
+
+writeCohort(partial_prev10y_colorectal_cancer, here::here("preliminary_cohorts", "jsons",
+                                                          "colorectal_cancer_10y.json"))
 
 
 # colon
@@ -281,21 +280,6 @@ writeCohort(total_prev_colon_cancer, here::here("preliminary_cohorts", "jsons",
                                                 "colon_cancer_end.json"))
 
 
-
-#prev 2 year
-partial_prev2y_colon_cancer <- cohort(
-  entry = entry(
-    conditionOccurrence(getConceptSetDetails(cs(colon_cancer_prev, name = "colon_cancer_2y"), db, vocabularyDatabaseSchema = "public")),
-    observationWindow = continuousObservation(0L, 0L),
-    primaryCriteriaLimit = "First"
-  ),
-  exit = exit(fixedExit("startDate", 720L)
-  )
-)
-
-writeCohort(partial_prev2y_colon_cancer, here::here("preliminary_cohorts", "jsons",
-                                                    "colon_cancer_2y.json"))
-
 # prev 5 year
 partial_prev5y_colon_cancer <- cohort(
   entry = entry(
@@ -310,6 +294,19 @@ partial_prev5y_colon_cancer <- cohort(
 writeCohort(partial_prev5y_colon_cancer, here::here("preliminary_cohorts", "jsons",
                                                     "colon_cancer_5y.json"))
 
+# prev 10 year
+partial_prev10y_colon_cancer <- cohort(
+  entry = entry(
+    conditionOccurrence(getConceptSetDetails(cs(colon_cancer_prev, name = "colon_cancer_10y"), db, vocabularyDatabaseSchema = "public")),
+    observationWindow = continuousObservation(0L, 0L),
+    primaryCriteriaLimit = "First"
+  ),
+  exit = exit(fixedExit("startDate", 3650L)
+  )
+)
+
+writeCohort(partial_prev10y_colon_cancer, here::here("preliminary_cohorts", "jsons",
+                                                     "colon_cancer_10y.json"))
 
 
 # rectal
@@ -328,21 +325,6 @@ writeCohort(total_prev_rectal_cancer, here::here("preliminary_cohorts", "jsons",
                                                  "rectal_cancer_end.json"))
 
 
-
-#prev 2 year
-partial_prev2y_rectal_cancer <- cohort(
-  entry = entry(
-    conditionOccurrence(getConceptSetDetails(cs(rectal_cancer_prev, name = "rectal_cancer_2y"), db, vocabularyDatabaseSchema = "public")),
-    observationWindow = continuousObservation(0L, 0L),
-    primaryCriteriaLimit = "First"
-  ),
-  exit = exit(fixedExit("startDate", 720L)
-  )
-)
-
-writeCohort(partial_prev2y_rectal_cancer, here::here("preliminary_cohorts", "jsons",
-                                                     "rectal_cancer_2y.json"))
-
 # prev 5 year
 partial_prev5y_rectal_cancer <- cohort(
   entry = entry(
@@ -356,3 +338,18 @@ partial_prev5y_rectal_cancer <- cohort(
 
 writeCohort(partial_prev5y_rectal_cancer, here::here("preliminary_cohorts", "jsons",
                                                      "rectal_cancer_5y.json"))
+
+# prev 10 year
+partial_prev10y_rectal_cancer <- cohort(
+  entry = entry(
+    conditionOccurrence(getConceptSetDetails(cs(rectal_cancer_prev, name = "rectal_cancer_10y"), db, vocabularyDatabaseSchema = "public")),
+    observationWindow = continuousObservation(0L, 0L),
+    primaryCriteriaLimit = "First"
+  ),
+  exit = exit(fixedExit("startDate", 3650L)
+  )
+)
+
+writeCohort(partial_prev10y_rectal_cancer, here::here("preliminary_cohorts", "jsons",
+                                                      "rectal_cancer_10y.json"))
+
