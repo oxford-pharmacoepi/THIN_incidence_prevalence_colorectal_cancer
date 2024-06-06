@@ -2,9 +2,26 @@
   "ConceptSets": [
     {
       "id": 0,
-      "name": "colorectal_cancer_2y",
+      "name": "colorectal_cancer_10y",
       "expression": {
         "items": [
+          {
+            "concept": {
+              "CONCEPT_ID": 3184757,
+              "CONCEPT_NAME": "Stage I carcinoma of rectum",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "CONCEPT_CODE": "7810001000004109",
+              "DOMAIN_ID": "Condition",
+              "VOCABULARY_ID": "Nebraska Lexicon",
+              "CONCEPT_CLASS_ID": "Clinical Finding"
+            },
+            "isExcluded": false,
+            "includeDescendants": false,
+            "includeMapped": false
+          },
           {
             "concept": {
               "CONCEPT_ID": 435754,
@@ -439,23 +456,6 @@
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
               "CONCEPT_CODE": "187760008",
-              "DOMAIN_ID": "Condition",
-              "VOCABULARY_ID": "SNOMED",
-              "CONCEPT_CLASS_ID": "Clinical Finding"
-            },
-            "isExcluded": false,
-            "includeDescendants": false,
-            "includeMapped": false
-          },
-          {
-            "concept": {
-              "CONCEPT_ID": 4287939,
-              "CONCEPT_NAME": "Rectum involved by direct extension of malignant neoplasm",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "CONCEPT_CODE": "397229005",
               "DOMAIN_ID": "Condition",
               "VOCABULARY_ID": "SNOMED",
               "CONCEPT_CLASS_ID": "Clinical Finding"
@@ -1612,23 +1612,6 @@
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
               "CONCEPT_CODE": "8934/3-C18.2",
-              "DOMAIN_ID": "Condition",
-              "VOCABULARY_ID": "ICDO3",
-              "CONCEPT_CLASS_ID": "ICDO Condition"
-            },
-            "isExcluded": false,
-            "includeDescendants": false,
-            "includeMapped": false
-          },
-          {
-            "concept": {
-              "CONCEPT_ID": 36565126,
-              "CONCEPT_NAME": "Malignant mastocytosis of ascending colon",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "CONCEPT_CODE": "9741/3-C18.2",
               "DOMAIN_ID": "Condition",
               "VOCABULARY_ID": "ICDO3",
               "CONCEPT_CLASS_ID": "ICDO Condition"
@@ -6348,23 +6331,6 @@
           },
           {
             "concept": {
-              "CONCEPT_ID": 4198567,
-              "CONCEPT_NAME": "HNPCC - hereditary nonpolyposis colon cancer",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "CONCEPT_CODE": "315058005",
-              "DOMAIN_ID": "Condition",
-              "VOCABULARY_ID": "SNOMED",
-              "CONCEPT_CLASS_ID": "Clinical Finding"
-            },
-            "isExcluded": false,
-            "includeDescendants": false,
-            "includeMapped": false
-          },
-          {
-            "concept": {
               "CONCEPT_ID": 35624316,
               "CONCEPT_NAME": "Squamous cell carcinoma of colon",
               "STANDARD_CONCEPT": "S",
@@ -9742,7 +9708,7 @@
   "EndStrategy": {
     "DateOffset": {
       "DateField": "StartDate",
-      "Offset": 720
+      "Offset": 3650
     }
   },
   "CensoringCriteria": [],
