@@ -13,7 +13,9 @@ cdm <- generateDenominatorCohortSet(
   requirementInteractions = TRUE,
   ageGroup =list(
     c(18, 150),
-    c(18, 49),
+    c(18, 29),
+    c(30, 39),
+    c(40, 49),
     c(50, 59),
     c(60, 69),
     c(70, 79),
