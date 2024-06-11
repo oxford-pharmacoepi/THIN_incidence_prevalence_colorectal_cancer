@@ -104,12 +104,12 @@ results <-list.files(here("data"), full.names = TRUE,
 #unzip data
 for (i in (1:length(results))) {
   utils::unzip(zipfile = results[[i]],
-               exdir = here("data"))
+               exdir = here("data", "exports"))
 }
 
 #grab the results from the folders
 results <- list.files(
-  path = here("data"),
+  path = here("data", "exports"),
   pattern = ".csv",
   full.names = TRUE,
   recursive = TRUE,
@@ -177,8 +177,9 @@ if(length(json_files > 0)){
 }
 
   concept_sets_final <- concept_sets_final %>% 
-  mutate(name = ifelse(name == "lung_cancer_broad_inc", "lung_cancer_incident_broad", name)) %>% 
-  mutate(name = ifelse(name == "lung_cancer_narrow_inc", "lung_cancer_incident_narrow", name)) 
+  mutate(name = ifelse(name == "colon_cancer_inc", "colon_cancer_incident", name)) %>% 
+  mutate(name = ifelse(name == "colorectal_cancer_inc", "colorectal_cancer_incident", name)) %>% 
+  mutate(name = ifelse(name == "rectal_cancer_inc", "rectal_cancer_incident", name))
   
 # incidence estimates not standardized -----
 incidence_estimates_files <-results[stringr::str_detect(results, ".csv")]
