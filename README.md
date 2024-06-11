@@ -1,7 +1,7 @@
 # Incidence, Prevalence and Characterisation of Colorectal Cancer across Europe
 <img src="https://img.shields.io/badge/Study%20Status-Started-blue.svg" alt="Study Status: Started">
 
-- **Study title**: Incidence, Prevalence and Characterisation of Colorectal Cancer across Europe
+- **Study title**: Incidence, Prevalence and Characterisation of Colorectal Cancer across Europe, a Birth Cohort perspective
 - **Study start date**: 24/05/24
 - **Study leads**: Patri Pedregal Pascual (patri.pedregalpascual@ndorms.ox.ac.uk)
 - **Study end date**:
