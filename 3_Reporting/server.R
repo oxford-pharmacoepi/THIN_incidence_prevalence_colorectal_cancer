@@ -248,8 +248,8 @@ server <-	function(input, output, session) {
       filter(sex %in% input$demographics_sex_selector) %>% 
       filter(age_group %in% input$demographics_age_selector) %>% 
       filter(cohort_name %in% input$demographics_cohort_selector) %>% 
-      filter(cdm_name %in% input$demographics_database_name_selector) %>% 
-      filter(year %in% input$demo_diag_yr_selector) %>% 
+      filter(cdm_name %in% input$demographics_database_name_selector) %>%
+      filter(year %in% input$demographics_diag_yr_selector) %>%
       visOmopResults::uniteGroup("cohort_name") %>% 
       visOmopResults::uniteStrata(c("sex", "age_group", "year")) 
     

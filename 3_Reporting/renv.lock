@@ -1515,14 +1515,9 @@
     },
     "omopgenerics": {
       "Package": "omopgenerics",
-      "Version": "0.2.1.900",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "omopgenerics",
-      "RemoteUsername": "darwin-eu-dev",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "40a1149097ce7dde7f8bb7d05e5b418a795c17f9",
+      "Version": "0.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "cli",
@@ -1535,7 +1530,7 @@
         "stringr",
         "tidyr"
       ],
-      "Hash": "2e05acd48b85c9424468f41dc9f489cb"
+      "Hash": "b696a8bc173331b645f23d098a4baafd"
     },
     "openssl": {
       "Package": "openssl",
@@ -2180,14 +2175,15 @@
     },
     "systemfonts": {
       "Package": "systemfonts",
-      "Version": "1.0.6",
+      "Version": "1.1.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
-        "cpp11"
+        "cpp11",
+        "lifecycle"
       ],
-      "Hash": "6d538cff441f0f1f36db2209ac7495ac"
+      "Hash": "213b6b8ed5afbf934843e6c3b090d418"
     },
     "testthat": {
       "Package": "testthat",

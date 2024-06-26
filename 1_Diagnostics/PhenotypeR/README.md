@@ -26,5 +26,5 @@ shiny::runApp() or open up the UI.R file and click "Run App"
 
 Your local shiny app is ready!
 
-Any problems with the repository or shiny apps contact danielle.newby@ndorms.ox.ac.uk
+Any problems with the repository or shiny apps contact patri.pedregalpascual@ndorms.ox.ac.uk
 

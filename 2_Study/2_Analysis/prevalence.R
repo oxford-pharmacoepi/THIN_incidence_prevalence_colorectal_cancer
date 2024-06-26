@@ -34,7 +34,7 @@ cli::cli_alert_success("- Got denominator")
 # Estimate prevalence -------
 cli::cli_alert_info("- Getting prevalence")
 
-# prevalence until end of observation (total) and partial prevalence at 2 and 5 years
+# prevalence until end of observation (total) and partial prevalence at 5 and 10 years
 prev <- estimatePeriodPrevalence(
   cdm,
   denominatorTable = "denominator",

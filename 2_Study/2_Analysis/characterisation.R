@@ -106,6 +106,8 @@ cli::cli_alert_info("Summarising Demographics")
     
   }
   
+
+  
 cli::cli_alert_info("Exporting demographics characteristics results")
 
 omopgenerics::exportSummarisedResult(summaryDemographics,
@@ -129,8 +131,10 @@ cdm <- CDMConnector::generateConceptCohortSet(cdm = cdm,
 
 cli::cli_alert_info("Summarising Comorbidities")
 
-# run if survival not run but incidence has been run
-if(isFALSE(run_survival) & isTRUE(run_incidence)){  
+# run if survival not run but incidence has been run OR if only running characterisation
+if(isFALSE(run_survival) & isTRUE(run_incidence) |
+   isFALSE(run_survival) & isFALSE(run_incidence)
+   & isFALSE(run_prevalence) & isTRUE(run_characterisation)){   
   
   suppressWarnings(
     
@@ -227,6 +231,7 @@ if(isTRUE(run_survival) & isTRUE(run_incidence) |
 }
 
 cli::cli_alert_info("Exporting comorbidities characteristics results")
+
 omopgenerics::exportSummarisedResult(summaryComorbidity,
             minCellCount = 5,
             path = here("Results",db_name),
@@ -248,7 +253,9 @@ cdm <- DrugUtilisation::generateDrugUtilisationCohortSet(cdm = cdm,
 
 cli::cli_alert_info("Summarising Medications")
 # runs if survival has not been run but incidence has
-if(isFALSE(run_survival) & isTRUE(run_incidence)){  
+if(isFALSE(run_survival) & isTRUE(run_incidence) |
+   isFALSE(run_survival) & isFALSE(run_incidence)
+   & isFALSE(run_prevalence) & isTRUE(run_characterisation)){  
   
   suppressWarnings(
     

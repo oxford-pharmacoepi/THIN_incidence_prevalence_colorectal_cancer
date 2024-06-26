@@ -99,4 +99,4 @@ run_characterisation <- TRUE
 source(here("RunStudy.R"))
 
 # disconnect from the database (only do this after you have run all analysis)
-#dbDisconnect(db)
+# dbDisconnect(db)

@@ -112,34 +112,6 @@ ui <- dashboardPage(
 
       ),
       
-      menuItem(
-        text = "Survival",
-        tabName = "os",
-        icon = shiny::icon("life-ring") ,
-        menuSubItem(
-          text = "Survival Plots",
-          tabName = "survival_results"
-        ),
-        menuSubItem(
-          text = "Risk Table",
-          tabName = "risk_results"
-        ),
-        
-        menuSubItem(
-          text = "Survival Summary",
-          tabName = "stats_results"
-        ) ,
-      
-      menuSubItem(
-        text = "Attrition Table",
-        tabName = "cohort_attrition"
-      ),
-      menuSubItem(
-        text = "Attrition Figure",
-        tabName = "cohort_attr_fig"
-      )
-    ),
-      
       
 
     
@@ -179,19 +151,19 @@ ui <- dashboardPage(
       # background  ------
       tabItem(
         tabName = "background",
-        h3("Worldwide incidence of lung cancer: a multinational cohort study"),
+        h3("Worldwide incidence of colorectal cancer: a multinational cohort study"),
         tags$h4(tags$strong("Please note, the results presented here should be considered as
                                                 preliminary and subject to change.")),
         
         tags$h5(
           tags$span("Background:", style = "font-weight: bold;"),
-          "Lung cancer is the leading cause of cancer-associated mortality worldwide. New diagnoses are predicted to nearly double by 2070 meaning it will continue to be a major cause of morbidity and mortality globally. While lung cancer incidence rates have been declining in some high-income countries due to reductions in smoking and advancements in screening and treatment, the incidence continues to rise in many low- and middle-income countries. This disparity underscores the importance of understanding the regional variations in lung cancer burden and identifying the underlying factors driving these trends. The aim of this study is to estimate lung cancer incidence in a variety of different data sources across the globe."
+          "Colorectal cancer is the third most common cancer and the second most common cause of cancer-related death for both men and woman worldwide in 2020. Incidence and mortality have increased among younger adults in nearly all regions of the world during the last decades. The aim of this study is to estimate colorectal cancer incidence in a variety of different data sources across the globe."
           
         ),
 
         tags$h5(
           tags$span(" Methods:", style = "font-weight: bold;"),
-          "We performed a population-based cohort study using the real world databases from primary care and claims. The study period was from January 1, 2003 (or the earliest available data) until database exit, death, or the end of the study on 1st January, 2023. Participants aged 18+ years, with a diagnoses of primary lung cancer, with one-year of prior data availability, were included. We estimated overall lung cancer incidence rates (IR) and stratified by sex and age groups using the",
+          "We performed a population-based cohort study using the real world databases from primary care and claims. The study period was from January 1, 2003 (or the earliest available data) until database exit, death, or the end of the study on 1st January, 2023. Participants aged 18+ years, with a diagnoses of primary colorectal cancer, with one-year of prior data availability, were included. We estimated overall colorectal cancer incidence rates (IR) and stratified by sex and age groups using the",
           tags$a(href="https://darwin-eu.github.io/IncidencePrevalence/", "IncidencePrevalence R package"),
  "Crude IRs were age standardized using European and World Standard populations."
           
@@ -217,7 +189,7 @@ ui <- dashboardPage(
         
         tags$h5("The analysis code used to generate these results can be found",
                 tags$a(href="https://github.com/oxford-pharmacoepi/OPTIMA_incidence_survival", "here"),
-                ".The cohort diagnostics for lung cancer phenotypes can be found",
+                ".The cohort diagnostics for colorectal cancer phenotypes can be found",
                 tags$a(href="https://github.com/oxford-pharmacoepi", "here")
                 
         ),
@@ -1076,7 +1048,7 @@ ui <- dashboardPage(
       
       tabItem(
         tabName = "prev_plots",
-        tags$h5("Below are the prevalence results for the different databases. Yearly estimates have been calculated in three different scenarios 1) Full prevalence: Those diagnosed with lung cancer are followed to the end of their observation period and remain in the numerator, 2) Partial prevalence: where patients diagnosed with lung cancer are followed until 2 or 5 years before they are then returned to the background population (denominator). ") ,
+        tags$h5("Below are the prevalence results for the different databases. Yearly estimates have been calculated in three different scenarios 1) Full prevalence: Those diagnosed with colorectal cancer are followed to the end of their observation period and remain in the numerator, 2) Partial prevalence: where patients diagnosed with colorectal cancer are followed until 5 or 10 years before they are then returned to the background population (denominator). ") ,
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(

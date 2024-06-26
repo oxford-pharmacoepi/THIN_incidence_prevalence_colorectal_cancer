@@ -303,7 +303,8 @@ data$cohort_overlap <- data$cohort_overlap %>%
 data$age_distribution <- data$age_distribution %>%
   ungroup() %>%
   inner_join(data$cohort_count %>% select(cdm_name, cohort_definition_id, cohort_name)) %>%
-  select(-cohort_definition_id)
+  select(cohort_definition_id)
+
 # Time distribution
 to_pivot <- colnames(data$time_distribution)[!colnames(data$time_distribution) %in%
                                                c("sex", "cohort_name", "cdm_name", "cohort_definition_id")]
