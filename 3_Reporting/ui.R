@@ -195,7 +195,7 @@ ui <- dashboardPage(
         ),
         
         tags$h5("Any questions regarding this shiny app please contact",
-                tags$a(href="mailto:danielle.newby@ndorms.ox.ac.uk", "Danielle Newby"), "and any questions regarding this study please contact the corresponding author",
+                tags$a(href="mailto:patri.pedregalpascual@ndorms.ox.ac.uk", "Patricia Pedregal-Pascual"), "and any questions regarding this study please contact the corresponding author",
                 tags$a(href="mailto:daniel.prietoalhambra@ndorms.ox.ac.uk", "Professor Daniel Prieto Alhambra")
 
         
