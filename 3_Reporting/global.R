@@ -34,7 +34,7 @@ library(dplyr)
 library(readr)
 
 # install.packages("devtools")
-# devtools::install_github("darwin-eu-dev/omopgenerics", force = T)
+devtools::install_github("darwin-eu-dev/omopgenerics", force = T)
 
 mytheme <- create_theme(
   adminlte_color(
