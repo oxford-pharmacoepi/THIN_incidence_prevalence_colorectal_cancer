@@ -1,5 +1,5 @@
 #### PACKAGES -----
-renv::restore()
+# renv::restore()
 
 library(shiny)
 library(shinydashboard)
@@ -104,12 +104,12 @@ results <-list.files(here("data"), full.names = TRUE,
 #unzip data
 for (i in (1:length(results))) {
   utils::unzip(zipfile = results[[i]],
-               exdir = here("data", "exports"))
+               exdir = here("exports"))
 }
 
 #grab the results from the folders
 results <- list.files(
-  path = here("data", "exports"),
+  path = here("exports"),
   pattern = ".csv",
   full.names = TRUE,
   recursive = TRUE,
@@ -573,10 +573,4 @@ attritionChart <- function(x) {
   
   return(xg)
 }
-
-# saveRDS(comorb_characteristics, file = "comorb_characteristics.rds")
-# saveRDS(med_characteristics, file = "med_characteristics.rds")
-
-# readRDS(file = "comorb_characteristics.rds")
-# readRDS(file = "med_characteristics.rds")
 
