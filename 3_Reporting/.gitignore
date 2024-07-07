@@ -10,3 +10,6 @@ data/*.txt
 data/exports/*.csv
 data/exports/*.zip
 data/exports/*.txt
+exports/*.csv
+exports/*.zip
+exports/*.txt
