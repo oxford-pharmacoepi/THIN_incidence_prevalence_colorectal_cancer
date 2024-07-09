@@ -1547,7 +1547,7 @@ server <-	function(input, output, session) {
     content = function(file) {
       ggsave(
         file,
-        get_incidence_plot(),
+        get_prevalence_plot(),
         width = as.numeric(input$prevalence_download_width),
         height = as.numeric(input$prevalence_download_height),
         dpi = as.numeric(input$prevalence_download_dpi),
