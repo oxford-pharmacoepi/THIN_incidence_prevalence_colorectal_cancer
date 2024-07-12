@@ -103,12 +103,12 @@ results <-list.files(here("data"), full.names = TRUE,
 #unzip data
 for (i in (1:length(results))) {
   utils::unzip(zipfile = results[[i]],
-               exdir = here("exports"))
+               exdir = here("data", "exports"))
 }
 
 #grab the results from the folders
 results <- list.files(
-  path = here("exports"),
+  path = here("data", "exports"),
   pattern = ".csv",
   full.names = TRUE,
   recursive = TRUE,
