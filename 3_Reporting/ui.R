@@ -1158,7 +1158,7 @@ ui <- dashboardPage(
         
         div(
           style = "width: 80vh; height: 5vh;",  # Set width to 100% for responsive design
-          checkboxInput("show_error_bars1", "Show Ribbons", value = TRUE)
+          checkboxInput("show_ci", "Show Confidence Intervals", value = TRUE)
         ),
         
         div(
@@ -1416,4 +1416,3 @@ ui <- dashboardPage(
   
   
 )
-

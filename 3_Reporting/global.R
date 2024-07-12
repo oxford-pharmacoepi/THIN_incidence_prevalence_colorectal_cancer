@@ -25,7 +25,6 @@ library(DiagrammeRsvg)
 library(rsvg)
 library(CirceR)
 library(rclipboard)
-library(CodelistGenerator)
 library(CohortSurvival)
 library(CohortCharacteristics)
 library(rjson)
@@ -33,8 +32,8 @@ library(omopgenerics)
 library(dplyr)
 library(readr)
 
-# install.packages("devtools")
-devtools::install_github("darwin-eu-dev/omopgenerics", force = T)
+#install.packages("devtools")
+# devtools::install_github("darwin-eu-dev/omopgenerics", force = T)
 
 mytheme <- create_theme(
   adminlte_color(
@@ -57,7 +56,7 @@ mytheme <- create_theme(
     active_link_hover_border_color = "#112446",
     link_hover_border_color = "#112446",
     table_border_color = "black"
-
+    
   )
 )
 
@@ -146,17 +145,17 @@ for (n in  row_number(cohort_set) ) {
 # in dataframe
 # Get a list of JSON files in the directory
 json_files <- list.files(path = here("www", "Cohorts", "incidence"), pattern = "\\.json$", full.names = TRUE)
-  concept_lists_temp <- list()
-  concept_lists <- list()
-  concept_sets <- list()
-  
+concept_lists_temp <- list()
+concept_lists <- list()
+concept_sets <- list()
+
 if(length(json_files > 0)){
   
   for(i in seq_along(json_files)){
     concept_lists_temp[[i]] <- fromJSON(file = json_files[[i]]) 
     
   } 
-
+  
   for(i in 1:length(concept_lists_temp)){
     
     for(k in 1:length(concept_lists_temp[[i]]$ConceptSets[[1]]$expression$items)){  
@@ -164,10 +163,10 @@ if(length(json_files > 0)){
       concept_sets[[k]] <- bind_rows(concept_lists_temp[[i]]$ConceptSets[[1]]$expression$items[[k]]$concept)  
       
     }
-
+    
     concept_lists[[i]] <- bind_rows(concept_sets) %>% 
       mutate(name = concept_lists_temp[[i]]$ConceptSets[[1]]$name)
-      
+    
     
   }
   
@@ -176,90 +175,90 @@ if(length(json_files > 0)){
   
 }
 
-  concept_sets_final <- concept_sets_final %>% 
+concept_sets_final <- concept_sets_final %>% 
   mutate(name = ifelse(name == "colon_cancer_inc", "colon_cancer_incident", name)) %>% 
   mutate(name = ifelse(name == "colorectal_cancer_inc", "colorectal_cancer_incident", name)) %>% 
   mutate(name = ifelse(name == "rectal_cancer_inc", "rectal_cancer_incident", name))
-  
+
 # incidence estimates not standardized -----
 incidence_estimates_files <-results[stringr::str_detect(results, ".csv")]
 incidence_estimates_files <-results[stringr::str_detect(results, "incidence_estimates")]
 
 if(length(incidence_estimates_files > 0)){
   
-incidence_estimates_files <-incidence_estimates_files[!(stringr::str_detect(incidence_estimates_files, "age_std_"))]
-
-incidence_estimates <- list()
-
-for(i in seq_along(incidence_estimates_files)){
-  incidence_estimates[[i]]<-readr::read_csv(incidence_estimates_files[[i]], 
-                                            show_col_types = FALSE)  
+  incidence_estimates_files <-incidence_estimates_files[!(stringr::str_detect(incidence_estimates_files, "age_std_"))]
+  
+  incidence_estimates <- list()
+  
+  for(i in seq_along(incidence_estimates_files)){
+    incidence_estimates[[i]]<-readr::read_csv(incidence_estimates_files[[i]], 
+                                              show_col_types = FALSE)  
+    
+    
+  }
   
   
-}
-
-
-incidence_estimates <- dplyr::bind_rows(incidence_estimates) %>% 
-  mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
-
-
-# perform a filter to remove data with no values ie small cell lung cancer
-remove_outcomes <- incidence_estimates %>% 
-  filter(analysis_interval == "overall") %>% 
-  filter(denominator_sex == "Both") %>% 
-  filter(denominator_age_group == "18 to 150") %>% 
-  group_by(outcome_cohort_name) %>%
-  filter(sum(n_events) == 0) %>% 
-  distinct(outcome_cohort_name) %>% 
-  pull(outcome_cohort_name)
-
-incidence_estimates <- dplyr::bind_rows(incidence_estimates) %>% 
-  filter(!(outcome_cohort_name %in% remove_outcomes ))  %>% 
-  mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
-
-# age standardized incidence estimates -----
-incidence_estimates_files_std<-results[stringr::str_detect(results, ".csv")]
-incidence_estimates_files_std<-results[stringr::str_detect(results, "incidence_estimates")]
-incidence_estimates_files_std<-incidence_estimates_files_std[(stringr::str_detect(incidence_estimates_files_std, "age_std_"))]
-
-incidence_estimates_std <- list()
-
-for(i in seq_along(incidence_estimates_files_std)){
-  incidence_estimates_std[[i]]<-readr::read_csv(incidence_estimates_files_std[[i]], 
-                                            show_col_types = FALSE)  
-}
-
-incidence_estimates_std <- dplyr::bind_rows(incidence_estimates_std) %>% 
-  filter(!(outcome_cohort_name %in% remove_outcomes) ) %>% 
-  mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
-
-# incidence attrition -----
-incidence_attrition_files<-results[stringr::str_detect(results, ".csv")]
-incidence_attrition_files<-results[stringr::str_detect(results, "incidence_attrition")]
-incidence_attrition <- list()
-
-for(i in seq_along(incidence_attrition_files)){
-  incidence_attrition[[i]]<-readr::read_csv(incidence_attrition_files[[i]], 
-                                            show_col_types = FALSE)  
-}
-
-incidence_attrition <- dplyr::bind_rows(incidence_attrition) %>% 
-  filter(!(outcome_cohort_name %in% remove_outcomes ))  %>% 
-  mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
-
-# incidence settings ------
-incidence_settings_files<-results[stringr::str_detect(results, ".csv")]
-incidence_settings_files<-results[stringr::str_detect(results, "incidence_settings")]
-incidence_settings <- list()
-for(i in seq_along(incidence_settings_files)){
-  incidence_settings[[i]]<-readr::read_csv(incidence_settings_files[[i]], 
-                                            show_col_types = FALSE)  
-}
-
-incidence_settings <- dplyr::bind_rows(incidence_settings) %>% 
-  filter(!(outcome_cohort_name %in% remove_outcomes ))  %>% 
-  mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
-
+  incidence_estimates <- dplyr::bind_rows(incidence_estimates) %>% 
+    mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
+  
+  
+  # perform a filter to remove data with no values ie small cell lung cancer
+  remove_outcomes <- incidence_estimates %>% 
+    filter(analysis_interval == "overall") %>% 
+    filter(denominator_sex == "Both") %>% 
+    filter(denominator_age_group == "18 to 150") %>% 
+    group_by(outcome_cohort_name) %>%
+    filter(sum(n_events) == 0) %>% 
+    distinct(outcome_cohort_name) %>% 
+    pull(outcome_cohort_name)
+  
+  incidence_estimates <- dplyr::bind_rows(incidence_estimates) %>% 
+    filter(!(outcome_cohort_name %in% remove_outcomes ))  %>% 
+    mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
+  
+  # age standardized incidence estimates -----
+  incidence_estimates_files_std<-results[stringr::str_detect(results, ".csv")]
+  incidence_estimates_files_std<-results[stringr::str_detect(results, "incidence_estimates")]
+  incidence_estimates_files_std<-incidence_estimates_files_std[(stringr::str_detect(incidence_estimates_files_std, "age_std_"))]
+  
+  incidence_estimates_std <- list()
+  
+  for(i in seq_along(incidence_estimates_files_std)){
+    incidence_estimates_std[[i]]<-readr::read_csv(incidence_estimates_files_std[[i]], 
+                                                  show_col_types = FALSE)  
+  }
+  
+  incidence_estimates_std <- dplyr::bind_rows(incidence_estimates_std) %>% 
+    filter(!(outcome_cohort_name %in% remove_outcomes) ) %>% 
+    mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
+  
+  # incidence attrition -----
+  incidence_attrition_files<-results[stringr::str_detect(results, ".csv")]
+  incidence_attrition_files<-results[stringr::str_detect(results, "incidence_attrition")]
+  incidence_attrition <- list()
+  
+  for(i in seq_along(incidence_attrition_files)){
+    incidence_attrition[[i]]<-readr::read_csv(incidence_attrition_files[[i]], 
+                                              show_col_types = FALSE)  
+  }
+  
+  incidence_attrition <- dplyr::bind_rows(incidence_attrition) %>% 
+    filter(!(outcome_cohort_name %in% remove_outcomes ))  %>% 
+    mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
+  
+  # incidence settings ------
+  incidence_settings_files<-results[stringr::str_detect(results, ".csv")]
+  incidence_settings_files<-results[stringr::str_detect(results, "incidence_settings")]
+  incidence_settings <- list()
+  for(i in seq_along(incidence_settings_files)){
+    incidence_settings[[i]]<-readr::read_csv(incidence_settings_files[[i]], 
+                                             show_col_types = FALSE)  
+  }
+  
+  incidence_settings <- dplyr::bind_rows(incidence_settings) %>% 
+    filter(!(outcome_cohort_name %in% remove_outcomes ))  %>% 
+    mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
+  
 }
 
 
@@ -272,12 +271,12 @@ if(length(prevalence_estimates_files > 0)){
   
   for(i in seq_along(prevalence_estimates_files)){
     prevalence_estimates[[i]]<-readr::read_csv(prevalence_estimates_files[[i]], 
-                                              show_col_types = FALSE)  
+                                               show_col_types = FALSE)  
   }
   
   prevalence_estimates <- dplyr::bind_rows(prevalence_estimates) %>% 
     mutate(cdm_name = str_replace_all(cdm_name, "_", " "))
-    
+  
   
   # prevalence attrition -----
   prevalence_attrition_files<-results[stringr::str_detect(results, ".csv")]
@@ -285,7 +284,7 @@ if(length(prevalence_estimates_files > 0)){
   prevalence_attrition <- list()
   for(i in seq_along(prevalence_attrition_files)){
     prevalence_attrition[[i]]<-readr::read_csv(prevalence_attrition_files[[i]], 
-                                              show_col_types = FALSE)  
+                                               show_col_types = FALSE)  
   }
   
   prevalence_attrition <- dplyr::bind_rows(prevalence_attrition) %>% 
@@ -298,7 +297,7 @@ if(length(prevalence_estimates_files > 0)){
   prevalence_settings <- list()
   for(i in seq_along(prevalence_settings_files)){
     prevalence_settings[[i]]<-readr::read_csv(prevalence_settings_files[[i]], 
-                                             show_col_types = FALSE)  
+                                              show_col_types = FALSE)  
   }
   
   prevalence_settings <- dplyr::bind_rows(prevalence_settings)  %>% 
@@ -312,38 +311,38 @@ tableone_demo_files <- results[stringr::str_detect(results, ".csv")]
 tableone_demo_files <- results[stringr::str_detect(results, "demographics")]
 
 if(length(tableone_demo_files > 0)){
-
-tableone_demo <- list()
-settings_demo <- list()
-
-for(i in seq_along(tableone_demo_files)){
-  #read in the files
-  tableone_demo[[i]] <- readr::read_csv(tableone_demo_files[[i]],
-                                                 show_col_types = FALSE)
   
+  tableone_demo <- list()
+  settings_demo <- list()
   
-  settings_demo[[i]] <- tableone_demo[[i]] %>%
-    dplyr::filter(variable_name == "settings")
+  for(i in seq_along(tableone_demo_files)){
+    #read in the files
+    tableone_demo[[i]] <- readr::read_csv(tableone_demo_files[[i]],
+                                          show_col_types = FALSE)
+    
+    
+    settings_demo[[i]] <- tableone_demo[[i]] %>%
+      dplyr::filter(variable_name == "settings")
+    
+    # remove from the summarised results
+    tableone_demo[[i]] <- tableone_demo[[i]] %>%
+      dplyr::filter(variable_name != "settings")
+    
+    #turn back into a summarised result
+    
+    tableone_demo[[i]] <- tableone_demo[[i]] %>%
+      omopgenerics::newSummarisedResult(
+        settings = tibble(
+          result_id = 1L,
+          result_type = settings_demo[[i]]$estimate_value[3],
+          package_name = settings_demo[[i]]$estimate_value[1],
+          package_version = settings_demo[[i]]$estimate_value[2],
+          value = 5)
+      )
+    
+    
+  }
   
-  # remove from the summarised results
-  tableone_demo[[i]] <- tableone_demo[[i]] %>%
-    dplyr::filter(variable_name != "settings")
-  
-  #turn back into a summarised result
-  
-  tableone_demo[[i]] <- tableone_demo[[i]] %>%
-    omopgenerics::newSummarisedResult(
-      settings = tibble(
-        result_id = 1L,
-        result_type = settings_demo[[i]]$estimate_value[3],
-        package_name = settings_demo[[i]]$estimate_value[1],
-        package_version = settings_demo[[i]]$estimate_value[2],
-        value = 5)
-    )
-
-
-}
-
 }
 
 demo_characteristics <- omopgenerics::bind(tableone_demo) %>%
@@ -363,7 +362,7 @@ if(length(tableone_med_files > 0)){
   for(i in seq_along(tableone_med_files)){
     #read in the files
     tableone_med[[i]] <- readr::read_csv(tableone_med_files[[i]],
-                                          show_col_types = FALSE)
+                                         show_col_types = FALSE)
     
     
     settings_med[[i]] <- tableone_med[[i]] %>%
@@ -384,7 +383,7 @@ if(length(tableone_med_files > 0)){
           package_version = settings_demo[[i]]$estimate_value[2],
           value = 5)
       )
-
+    
   }
   
 }
@@ -406,7 +405,7 @@ if(length(tableone_comorb_files > 0)){
   for(i in seq_along(tableone_comorb_files)){
     #read in the files
     tableone_comorb[[i]] <- readr::read_csv(tableone_comorb_files[[i]],
-                                         show_col_types = FALSE)
+                                            show_col_types = FALSE)
     
     
     settings_comorb[[i]] <- tableone_comorb[[i]] %>%
@@ -426,7 +425,7 @@ if(length(tableone_comorb_files > 0)){
           package_version = settings_comorb[[i]]$estimate_value[2],
           value = 5)
       )
-
+    
     
   }
   
@@ -573,4 +572,3 @@ attritionChart <- function(x) {
   
   return(xg)
 }
-
