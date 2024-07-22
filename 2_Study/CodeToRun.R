@@ -36,11 +36,11 @@ db_name<-"..."
 # Specify databaseConnector connection details -----
 # database connection details
 # connect to database
-user <- Sys.getenv("DB_USER")
-password <- Sys.getenv("DB_PASSWORD")
-port <- Sys.getenv("DB_PORT")
-host <- Sys.getenv("DB_HOST")
-server_dbi <- Sys.getenv("DB_SERVER_cdm_thin_..._202308_dbi")
+user <- "..."
+password <- "..."
+port <- "..."
+host <- "..."
+server_dbi <- "..."
 
 
 # Specify cdm_reference via DBI connection details -----
@@ -56,15 +56,15 @@ db <- DBI::dbConnect(RPostgres::Postgres(),
 
 # Set database details -----
 # The name of the schema that contains the OMOP CDM with patient-level data
-cdm_database_schema <- "public"
+cdm_database_schema <- "..."
 
 
 # The name of the schema that contains the vocabularies 
 # (often this will be the same as cdm_database_schema)
-vocabulary_database_schema <- cdm_database_schema
+vocabulary_database_schema <- "..."
 
 # The name of the schema where results tables will be created 
-results_database_schema <- "results"
+results_database_schema <- "..."
 
 # Name of outcome table in the result table where the outcome cohorts will be stored
 # Note, if there is an existing table in your results schema with the same names
