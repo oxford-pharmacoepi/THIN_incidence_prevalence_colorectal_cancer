@@ -47,7 +47,7 @@ server_dbi <- "..."
 # In this study we also use the DBI package to connect to the database
 # set up the dbConnect details below (see https://dbi.r-dbi.org/articles/dbi for more details)
 # you may need to install another package for this (although RPostgres is included with renv in case you are using postgres)
-db <- DBI::dbConnect(RPostgres::Postgres(),
+db <- dbConnect("...",
                 dbname = server_dbi,
                 port = port,
                 host = host, 
@@ -69,7 +69,7 @@ results_database_schema <- "..."
 # Name of outcome table in the result table where the outcome cohorts will be stored
 # Note, if there is an existing table in your results schema with the same names
 # it will be overwritten 
-table_stem <- "eocrc"
+table_stem <- "..."
 
 # create cdm reference ----
 cdm <- CDMConnector::cdm_from_con(con = db,
